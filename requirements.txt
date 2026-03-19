@@ -1,6 +1,4 @@
 flask
 flask-cors
-gunicorn
-openai
-PyPDF2
 pdfplumber
+python-dotenv
