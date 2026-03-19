@@ -1,15 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pdfplumber
-import openai
+import os
+from openai import OpenAI
 
 app = Flask(__name__)
 CORS(app)
 
-# 🔑 Add your OpenAI API Key here
-import os
-
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# 🔑 OpenAI client (new SDK तरीका)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # ✅ Home route
 @app.route("/")
@@ -26,10 +25,10 @@ def extract_text(file):
     return text
 
 
-# 🤖 AI Suggestions Function
+# 🤖 AI Suggestions Function (UPDATED)
 def ai_suggestions(text):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {
@@ -47,9 +46,10 @@ def ai_suggestions(text):
             ]
         )
 
-        return response['choices'][0]['message']['content']
+        return response.choices[0].message.content
 
     except Exception as e:
+        print("AI Error:", e)  # useful for debugging in Render logs
         return "AI suggestions not available"
 
 
